@@ -14,12 +14,16 @@ public class EnemyAI : MonoBehaviour
 
     public float health;
 
+ 
+    public GameObject projectile;
+
+    public Material matAggro;
+    private  MeshRenderer mesh;
+    
     //patrol
     public Vector3 walkPoint;
     bool walkPointSet;
     public float walkPointRange;
-
-    public GameObject projectile;
 
     //attack
     public float timeBetweenAttack;
@@ -31,6 +35,7 @@ public class EnemyAI : MonoBehaviour
 
     private void Awake()
     {
+        mesh = GetComponent<MeshRenderer>();
         player = GameObject.Find("Player").transform;
         agent = GetComponent<NavMeshAgent>();
     }
@@ -74,11 +79,13 @@ public class EnemyAI : MonoBehaviour
 
     private void ChasePlayer()
     {
+        mesh.material = matAggro;
         agent.SetDestination(player.position);
     }
 
     private void AttackPlayer()
     {
+        mesh.material = matAggro;
         agent.SetDestination(transform.position);
 
         transform.LookAt(player);
@@ -100,14 +107,10 @@ public class EnemyAI : MonoBehaviour
     }
 
 
-    private void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         health -= damage;
-        if (health <= 0) Invoke(nameof(DestroyEnemy), .5f);
-    }
-
-    private void DestroyEnemy()
-    {
-        Destroy(gameObject);        
+        Debug.Log("Damage Taken: " + health);
+        if (health <= 0) Destroy(gameObject);
     }
 }
