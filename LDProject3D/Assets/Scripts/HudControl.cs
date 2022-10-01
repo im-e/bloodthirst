@@ -48,7 +48,7 @@ public class HudControl : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        float vial = pc.bloodVial;
+        float vial = pc.bloodInjector;
         float pool = pc.bloodPool;
 
         poolText.text = pc.bloodPool.ToString("0");

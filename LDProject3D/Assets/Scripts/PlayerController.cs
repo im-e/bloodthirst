@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour
     private KeyCode jumpKey = KeyCode.Space;
     private KeyCode sprintKey = KeyCode.LeftShift;
     private KeyCode crouchKey = KeyCode.LeftControl;
+    private KeyCode injectionKey = KeyCode.E;
+    private KeyCode meleeKey = KeyCode.Q;
 
     public MovementState state;
     public enum MovementState
@@ -18,6 +20,12 @@ public class PlayerController : MonoBehaviour
         air
     }
 
+    [Header("Attached Objects")]
+    public Gun gun;
+    public Spike spike;
+    public Transform orientation;
+    private Rigidbody rb;
+
     [Header("Movement")]
     //moving
     private float moveSpeed; //movepseed
@@ -25,6 +33,7 @@ public class PlayerController : MonoBehaviour
     public float sprintSpeed;
     public float groundDrag;    //drag on ground
     public float testCurrentVel;
+    private Vector3 moveDir;
 
     [Header("Jumping")]
     public float jumpForce;
@@ -51,32 +60,36 @@ public class PlayerController : MonoBehaviour
     public float health = 100f;
     public float maxHealth = 200f;
     public float bloodPool = 100f;
-    public float bloodVial = 0f;
+    public float bloodInjector = 0f;
     public bool isRage;
     private bool rageReset;
     public bool playerDies;
 
+    //static values
+    private static float maxVial = 100f;
+    private static float maxPool = 100f;
+    private static float maxGunHealth = 100f;
+    private static float vialOnKill = 25f;
+    private static float startingHealth = 100f;
 
-    private float drainTime = 0.1f;
-    private float drainAmount = 1f;
+    //blood training values
+    private static float drainTime = 0.1f;
+    private static float drainAmount = 1f;
     private float lastDrainTime;
 
+    //height value
     private float playerHeight;
 
-
+    [Header("Audio")]
     public AudioSource audioSourceJump;
     public AudioSource audioSourceInject;
     public AudioSource audioSourceRage;
 
-    GameObject gun;
+    //input variables
+    private float hozInput;
+    private float vertInput;
 
-    public Transform orientation;
-    float hozInput;
-    float vertInput;
 
-    Vector3 moveDir;
-
-    Rigidbody rb;
 
     private void Start()
     {
@@ -155,8 +168,6 @@ public class PlayerController : MonoBehaviour
         hozInput = Input.GetAxisRaw("Horizontal");
         vertInput = Input.GetAxisRaw("Vertical");
 
-
-
         //crouching
         if(Input.GetKeyDown(crouchKey))
         {
@@ -180,7 +191,7 @@ public class PlayerController : MonoBehaviour
         }
 
         //inject blood
-        if (Input.GetKey(KeyCode.Q) && bloodVial >= 100f)
+        if (Input.GetKey(injectionKey) && bloodInjector >= 100f)
         {
             InjectBlood();
         }
@@ -246,12 +257,13 @@ public class PlayerController : MonoBehaviour
 
     void InjectBlood()
     {
-        bloodVial = 0f;
-        bloodPool = 100f;
-        isRage = false;
-        rageReset = true;
-        if (health < 100f) health = 100f;
-        audioSourceInject.Play();
+        bloodInjector = 0f; //empty injector
+        bloodPool = maxPool; //fill pool
+        gun.gunHealth = 100f; //fill gun health
+        isRage = false; //disable rage
+        rageReset = true; //toggle rage as reset    
+        if (health < startingHealth) health = startingHealth;
+        audioSourceInject.Play(); //play injection sound
     }
     void DrainPool()
     {
@@ -260,13 +272,12 @@ public class PlayerController : MonoBehaviour
         {
             bloodPool -= drainAmount;
             lastDrainTime = 0f;
-            
         }
     }
 
     public void fillVial()
     {
-        bloodVial += 25f;
+        bloodInjector += vialOnKill;
     }
 
     private bool OnSlope()

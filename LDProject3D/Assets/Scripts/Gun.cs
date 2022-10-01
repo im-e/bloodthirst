@@ -2,49 +2,72 @@ using UnityEngine;
 
 public class Gun : MonoBehaviour
 {
-    private float damage;
-    private float range = 1000f;
+    [Header("Gun Stats")]
+    public float gunHealth = 100f; //health of player + ammo resource
 
-    private Camera cam;
+    private float damage;
+    private static float normalDamage = 50f;
+    private static float rageDamage = 100f;
+    private static float shotCost = 10f;
+    private static float range = 1000f;
+
+
+    private Camera cam; 
     private PlayerController pc;
     private ParticleSystem laser;
 
-    private AudioSource audioSource;
+    [Header("Audio")]
+    public AudioSource gunShoot; //gun shoot sound effect
+    public AudioSource gunEmpty; //gun empty sound effecrt
 
-    private float shootCooldown = 0.25f;
-    private float lastShotTime = 0f;
+    public GameObject healthDisplay; //display for gun health
 
-    public LayerMask enemyLayerMask;
-    private int enemyLayer;
+    private float shootCooldown = 0.5f; //time before you can shoot again
+    private float lastShotTime; //timer for how long has passed from last shot
+
+    public LayerMask enemyLayerMask;    //layer mask for enemy
+    private int enemyLayer; // int of the enemy layer mask
 
     private void Start()
     {
+        //obtain objects
         laser = GetComponentInChildren<ParticleSystem>();
         cam = GetComponentInParent<Camera>();
         pc = GameObject.Find("PlayerObject").GetComponent<PlayerController>();
-        audioSource = GetComponent<AudioSource>();
+        gunShoot = GetComponent<AudioSource>();
         enemyLayer = enemyLayerMask.value;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (pc.isRage) damage = rageDamage; //set gun damage
+        else damage = normalDamage;
+
+        //rotate gun towards crosshair for the particle laser
+        RotateGun();
+        //update gun health position
+        GunHealthPositon();
+
+        //add time since the last time you shot
         lastShotTime += Time.deltaTime;
-        if (Input.GetButtonDown("Fire1"))
+        //if shoot has been pressed
+        if (Input.GetButtonDown("Fire1") && gunHealth > 0)
         {
+            //if player hasnt shot before the cooldown
             if (lastShotTime >= shootCooldown) Shoot();
         }
-        RotateGun();
-
-        if (pc.isRage) damage = 100f;
-        else damage = 50f;
+        else if(Input.GetButtonDown("Fire1") && gunHealth <= 0)
+        {
+            gunEmpty.Play();
+        }
     }
     
     void Shoot()
     {
         //gun has been fired
         laser.Play();   //play laser particle effect
-        audioSource.Play(); //play sound effect
+        gunShoot.Play(); //play sound effect
         
         RaycastHit hit;
         if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, range, enemyLayer))
@@ -65,6 +88,9 @@ public class Gun : MonoBehaviour
              
         }
 
+        //take away health/ammo
+        gunHealth -= shotCost;
+
         //reset shot cooldown
         lastShotTime = 0f;
     }
@@ -77,5 +103,11 @@ public class Gun : MonoBehaviour
             Vector3 direction = hit.point - laser.transform.position;
             laser.transform.rotation = Quaternion.LookRotation(direction);
         }
+    }
+
+    void GunHealthPositon()
+    {
+        float zPos =  (gunHealth / 100) + 0.1f - 1f;
+        healthDisplay.transform.localPosition = new Vector3(healthDisplay.transform.localPosition.x, healthDisplay.transform.localPosition.y, zPos);
     }
 }
