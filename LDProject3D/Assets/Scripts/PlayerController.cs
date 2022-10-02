@@ -56,19 +56,20 @@ public class PlayerController : MonoBehaviour
     private RaycastHit slopeHit;
 
     [Header("Stats")]
-    public float health = 100f;
+    public float gunAmmo = 100f;
+    private static float maxAmmo = 100f;
+
     public float bloodPool = 100f;
+    private static float maxPool = 100f;
+
     public float bloodInjector = 0f;
+    private static float maxInjector = 100f;
+
     public bool isRage;
     private bool rageReset;
-    public bool playerDies;
+    public bool playerDead;
 
-    //static values
-    private static float maxVial = 100f;
-    private static float maxPool = 100f;
-    private static float maxHealth = 100f;
-
-    //blood training values
+    //blood draining values
     private static float drainTime = 0.1f;
     private static float drainAmount = 1f;
     private float lastDrainTime;
@@ -80,6 +81,15 @@ public class PlayerController : MonoBehaviour
     public AudioSource audioSourceJump;
     public AudioSource audioSourceInject;
     public AudioSource audioSourceRage;
+    public AudioSource audioSourceEnemyHit;
+    public AudioSource audioSourceEnemyKill;
+    public AudioSource audioSourcePoolTick;
+    public AudioSource audioSourceInjectorReduced;
+    public AudioSource audioSourceInjFilled;
+
+    private float poolTickPitch;
+    private static float poolTickTime = 1f;
+    private float lastPoolTickTime;
 
     //input variables
     private float hozInput;
@@ -106,33 +116,33 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        //blood pool control
-        if (bloodPool <= 0) Rage();
-        if (bloodPool <= -100) playerDies = true;
+        if (!playerDead)
+        {
+            //blood pool control
+            if (bloodPool <= 0) Rage();
+            if (bloodPool <= -100) PlayerDies();
 
-        //check if grounded
-        grounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+            //check if grounded
+            grounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
-        DrainPool();
-        StateHandler();
-        MyInput();
-        SpeedControl();
-        Drag();
-      
+            DrainPool();
+            StateHandler();
+            MyInput();
+            SpeedControl();
+            Drag();
+        }
 
-        //testing
-        testCurrentVel = rb.velocity.magnitude;
     }
 
     private void FixedUpdate()
     {
-        MovePlayer();
+        if (!playerDead) MovePlayer();
     }
 
     private void StateHandler()
     {
         //crouched
-        if(Input.GetKey(crouchKey) && grounded)
+        if (Input.GetKey(crouchKey) && grounded)
         {
             state = MovementState.crouching;
             moveSpeed = crouchSpeed;
@@ -158,19 +168,19 @@ public class PlayerController : MonoBehaviour
 
     }
     private void MyInput()
-    { 
+    {
         //Mouse Movement
         hozInput = Input.GetAxisRaw("Horizontal");
         vertInput = Input.GetAxisRaw("Vertical");
 
         //crouching
-        if(Input.GetKeyDown(crouchKey))
+        if (Input.GetKeyDown(crouchKey))
         {
             transform.localScale = new Vector3(transform.localScale.x, crouchYScale, transform.localScale.z);
             playerHeight = crouchYScale;
-            if(grounded)rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
+            if (grounded) rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
         }
-        if(Input.GetKeyUp(crouchKey))
+        if (Input.GetKeyUp(crouchKey))
         {
             transform.localScale = new Vector3(transform.localScale.x, startYScale, transform.localScale.z);
             playerHeight = startYScale;
@@ -186,7 +196,7 @@ public class PlayerController : MonoBehaviour
         }
 
         //inject blood
-        if (Input.GetKey(injectionKey) && bloodInjector >= maxVial)
+        if (Input.GetKey(injectionKey) && bloodInjector >= maxInjector)
         {
             InjectBlood();
         }
@@ -198,14 +208,14 @@ public class PlayerController : MonoBehaviour
         moveDir = orientation.forward * vertInput + orientation.right * hozInput;
 
         //on slope
-        if(OnSlope())
+        if (OnSlope())
         {
             rb.AddForce(GetSlopeMoveDir() * moveSpeed * 10f, ForceMode.Force);
         }
         //on ground
-        if(grounded) rb.AddForce(moveDir.normalized * moveSpeed * 10f, ForceMode.Force);
+        if (grounded) rb.AddForce(moveDir.normalized * moveSpeed * 10f, ForceMode.Force);
         //in air
-        else if(!grounded) rb.AddForce(moveDir.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
+        else if (!grounded) rb.AddForce(moveDir.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
 
     }
 
@@ -213,7 +223,7 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
-        if(flatVel.magnitude > moveSpeed)
+        if (flatVel.magnitude > moveSpeed)
         {
             Vector3 limitedVel = flatVel.normalized * moveSpeed;
             rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
@@ -223,12 +233,11 @@ public class PlayerController : MonoBehaviour
     private void Rage()
     {
         isRage = enabled;
-        if(rageReset)
+        if (rageReset)
         {
-            audioSourceRage.Play();
             rageReset = false;
         }
-       
+
     }
 
     private void Jump()
@@ -238,23 +247,18 @@ public class PlayerController : MonoBehaviour
         audioSourceJump.Play();
 
     }
-    private void Drag()
+
+    void PlayerDies()
     {
-        if (grounded)
-            rb.drag = groundDrag;
-        else
-            rb.drag = 0;
-    }
-    private void ResetJump()
-    {
-        readytoJump = true;
+        playerDead = true;
+        Time.timeScale = 0f;
     }
 
     void InjectBlood()
     {
         bloodInjector = 0f; //empty injector
         bloodPool = maxPool; //fill pool
-        health = 100f; //fill gun health
+        gunAmmo = maxAmmo; //fill gun health
         isRage = false; //disable rage
         rageReset = true; //toggle rage as reset    
         audioSourceInject.Play(); //play injection sound
@@ -262,16 +266,37 @@ public class PlayerController : MonoBehaviour
     void DrainPool()
     {
         lastDrainTime += Time.deltaTime;
+        lastPoolTickTime += Time.deltaTime;
+
         if (lastDrainTime >= drainTime)
         {
             bloodPool -= drainAmount;
             lastDrainTime = 0f;
         }
+
+        if (lastPoolTickTime >= poolTickTime)
+        {
+            poolTickPitch = (bloodPool / 100f) + 1.1f;
+            audioSourcePoolTick.pitch = poolTickPitch;
+            audioSourcePoolTick.Play();
+            if (isRage) audioSourceRage.Play();
+            lastPoolTickTime = 0f;
+        }
     }
 
-    public void fillVial(float amount)
+    public void FillInjector(float amount)
     {
         bloodInjector += amount;
+        if (bloodInjector >= maxInjector) Invoke("InjectorFilled", .5f);
+    }
+
+    void InjectorFilled() { audioSourceInjFilled.Play(); }
+
+    public void ReduceInjector(float amount)
+    {
+        audioSourceInjectorReduced.Play();
+        bloodInjector -= amount;
+        if (bloodInjector <= 0f) bloodInjector = 0f;
     }
 
     private bool OnSlope()
@@ -287,5 +312,18 @@ public class PlayerController : MonoBehaviour
     private Vector3 GetSlopeMoveDir()
     {
         return Vector3.ProjectOnPlane(moveDir, slopeHit.normal).normalized;
+    }
+
+    private void ResetJump()
+    {
+        readytoJump = true;
+    }
+
+    private void Drag()
+    {
+        if (grounded)
+            rb.drag = groundDrag;
+        else
+            rb.drag = 0;
     }
 }

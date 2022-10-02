@@ -8,13 +8,14 @@ public class EnemyAI : MonoBehaviour
 {
     public NavMeshAgent agent;
 
-    public Transform player;
+    private GameObject player;
+    private Transform playerTransform;
+    private PlayerController pc;
 
     public LayerMask groundMask, playerMask;
 
     public float health;
     public GameObject projectile;
-    public AudioSource damageSound;
 
     public Material matAggro;
     private  MeshRenderer mesh;
@@ -36,12 +37,16 @@ public class EnemyAI : MonoBehaviour
     {
         mesh = GetComponent<MeshRenderer>();
         agent = GetComponent<NavMeshAgent>();
+        player = GameObject.Find("PlayerObject");
+        playerTransform = player.transform;
+        pc = player.GetComponent<PlayerController>();
     }
 
 
     // Update is called once per frame
     void Update()
     {
+
         playerInSightRange = Physics.CheckSphere(transform.position, sightRange, playerMask);
         playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, playerMask);
 
@@ -77,7 +82,7 @@ public class EnemyAI : MonoBehaviour
     private void ChasePlayer()
     {
         mesh.material = matAggro;
-        agent.SetDestination(player.position);
+        agent.SetDestination(playerTransform.position);
     }
 
     private void AttackPlayer()
@@ -87,7 +92,7 @@ public class EnemyAI : MonoBehaviour
 
         //transform.LookAt(player);
 
-        Vector3 relativePos = player.position - transform.position;
+        Vector3 relativePos = playerTransform.position - transform.position;
 
         transform.rotation = Quaternion.LookRotation(relativePos, new Vector3(0, 1, 0));
 
@@ -96,7 +101,7 @@ public class EnemyAI : MonoBehaviour
             ///attack code here
             Rigidbody rb = Instantiate(projectile, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
             rb.AddForce(transform.forward * 32f, ForceMode.Impulse);
-            rb.AddForce(transform.up * 8f, ForceMode.Impulse);
+            rb.AddForce(transform.up * 5f, ForceMode.Impulse);
             alreadyAttacked = true;
             Invoke(nameof(ResetAttack), timeBetweenAttack);
         }    
@@ -110,8 +115,14 @@ public class EnemyAI : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
+        pc.audioSourceEnemyHit.Play();
         health -= damage;
-        damageSound.Play();
-        if (health <= 0) Destroy(gameObject);
+        if (health <= 0) KillEnemy();        
+    }
+
+    public void KillEnemy()
+    {
+        pc.audioSourceEnemyKill.Play();
+        Destroy(gameObject);
     }
 }

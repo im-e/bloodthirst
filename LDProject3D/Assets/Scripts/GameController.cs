@@ -1,10 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
+    public HudControl hc;
+    public PlayerController pc;
     private bool startGame;
+
+    private static float timeRestart = 3f;
 
 
     // Start is called before the first frame update
@@ -22,11 +27,19 @@ public class GameController : MonoBehaviour
         }
 
         if (startGame) GameStart();
+
+        if (pc.playerDead) Invoke("GameRestart", timeRestart);
     }
 
     void GameStart()
     {
+        hc.GameStart();
         Time.timeScale = 1.0f;
+    }
+
+    void GameRestart()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
 

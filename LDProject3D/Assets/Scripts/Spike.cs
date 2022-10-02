@@ -11,18 +11,17 @@ public class Spike : MonoBehaviour
     private static float vialRageFillAmount = 15f;
     private static float vialNormalFillAmount = 15f;
 
+    public float stabCooldown = 0.5f; //time before you can shoot again
+    public float lastStabTime; //timer for how long has passed from last shot
+
     private Camera cam;
     private PlayerController pc;
     private Animator animator;
 
     public LayerMask enemyMask;
 
-
-
     public AudioSource spikeStab; //stab sound event
 
-    public float stabCooldown = 0.5f; //time before you can shoot again
-    public float lastStabTime; //timer for how long has passed from last shot
 
     private void Start()
     {
@@ -65,7 +64,7 @@ public class Spike : MonoBehaviour
                 Debug.Log(hit.transform.name);
                 if ((AI.health - damage) <= 0f) //if damage would kill enemy
                 {
-                    pc.fillVial(vialFillAmount); //fill vial
+                    pc.FillInjector(vialFillAmount); //fill vial
                 }
                 AI.TakeDamage(damage); //deal damage
             }

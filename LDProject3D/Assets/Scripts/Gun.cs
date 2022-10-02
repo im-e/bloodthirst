@@ -51,12 +51,12 @@ public class Gun : MonoBehaviour
         //add time since the last time you shot
         lastShotTime += Time.deltaTime;
         //if shoot has been pressed
-        if (Input.GetButtonDown("Fire1") && pc.health > 0)
+        if (Input.GetButtonDown("Fire1") && pc.gunAmmo > 0)
         {
             //if player hasnt shot before the cooldown
             if (lastShotTime >= shootCooldown) Shoot();
         }
-        else if(Input.GetButtonDown("Fire1") && pc.health <= 0)
+        else if(Input.GetButtonDown("Fire1") && pc.gunAmmo <= 0)
         {
             gunEmpty.Play();
         }
@@ -71,16 +71,14 @@ public class Gun : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, range, enemyLayer))
         {
-            Debug.Log(hit.transform.name);
             //if it hits an enemy
-          
             //get enemy component
             EnemyAI AI = hit.transform.GetComponent<EnemyAI>();
             if(AI != null) //check just incase
             {
                 if((AI.health - damage) <= 0f) //if damage would kill enemy
                 {
-                    pc.fillVial(vialFillAmount); //fill vial
+                    pc.FillInjector(vialFillAmount); //fill vial
                 }
                 AI.TakeDamage(damage); //deal damage
             }
@@ -88,7 +86,7 @@ public class Gun : MonoBehaviour
         }
 
         //take away health/ammo
-        pc.health -= shotCost;
+        pc.gunAmmo -= shotCost;
 
         //reset shot cooldown
         lastShotTime = 0f;
@@ -106,7 +104,7 @@ public class Gun : MonoBehaviour
 
     void GunHealthPositon()
     {
-        float zPos =  (pc.health / 100) + 0.1f - 1f;
+        float zPos =  (pc.gunAmmo / 100) + 0.1f - 1f;
         healthDisplay.transform.localPosition = new Vector3(healthDisplay.transform.localPosition.x, healthDisplay.transform.localPosition.y, zPos);
     }
 }
