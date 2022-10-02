@@ -3,13 +3,12 @@ using UnityEngine;
 public class Gun : MonoBehaviour
 {
     [Header("Gun Stats")]
-    public float gunHealth = 100f; //health of player + ammo resource
-
     private float damage;
     private static float normalDamage = 50f;
     private static float rageDamage = 100f;
     private static float shotCost = 10f;
     private static float range = 1000f;
+    private static float vialFillAmount = 25f;
 
 
     private Camera cam; 
@@ -45,19 +44,19 @@ public class Gun : MonoBehaviour
         else damage = normalDamage;
 
         //rotate gun towards crosshair for the particle laser
-        RotateGun();
+        //RotateGun();
         //update gun health position
         GunHealthPositon();
 
         //add time since the last time you shot
         lastShotTime += Time.deltaTime;
         //if shoot has been pressed
-        if (Input.GetButtonDown("Fire1") && gunHealth > 0)
+        if (Input.GetButtonDown("Fire1") && pc.health > 0)
         {
             //if player hasnt shot before the cooldown
             if (lastShotTime >= shootCooldown) Shoot();
         }
-        else if(Input.GetButtonDown("Fire1") && gunHealth <= 0)
+        else if(Input.GetButtonDown("Fire1") && pc.health <= 0)
         {
             gunEmpty.Play();
         }
@@ -81,7 +80,7 @@ public class Gun : MonoBehaviour
             {
                 if((AI.health - damage) <= 0f) //if damage would kill enemy
                 {
-                    pc.fillVial(); //fill vial
+                    pc.fillVial(vialFillAmount); //fill vial
                 }
                 AI.TakeDamage(damage); //deal damage
             }
@@ -89,7 +88,7 @@ public class Gun : MonoBehaviour
         }
 
         //take away health/ammo
-        gunHealth -= shotCost;
+        pc.health -= shotCost;
 
         //reset shot cooldown
         lastShotTime = 0f;
@@ -107,7 +106,7 @@ public class Gun : MonoBehaviour
 
     void GunHealthPositon()
     {
-        float zPos =  (gunHealth / 100) + 0.1f - 1f;
+        float zPos =  (pc.health / 100) + 0.1f - 1f;
         healthDisplay.transform.localPosition = new Vector3(healthDisplay.transform.localPosition.x, healthDisplay.transform.localPosition.y, zPos);
     }
 }

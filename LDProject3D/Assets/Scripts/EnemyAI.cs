@@ -13,9 +13,8 @@ public class EnemyAI : MonoBehaviour
     public LayerMask groundMask, playerMask;
 
     public float health;
-
- 
     public GameObject projectile;
+    public AudioSource damageSound;
 
     public Material matAggro;
     private  MeshRenderer mesh;
@@ -36,7 +35,6 @@ public class EnemyAI : MonoBehaviour
     private void Awake()
     {
         mesh = GetComponent<MeshRenderer>();
-        player = GameObject.Find("Player").transform;
         agent = GetComponent<NavMeshAgent>();
     }
 
@@ -56,8 +54,7 @@ public class EnemyAI : MonoBehaviour
     {
         if (!walkPointSet) SearchWalkPoint();
 
-        if (walkPointSet)
-            agent.SetDestination(walkPoint);
+        if (walkPointSet) agent.SetDestination(walkPoint);
 
         Vector3 distanceToWalkPoint = transform.position - walkPoint;
 
@@ -88,7 +85,11 @@ public class EnemyAI : MonoBehaviour
         mesh.material = matAggro;
         agent.SetDestination(transform.position);
 
-        transform.LookAt(player);
+        //transform.LookAt(player);
+
+        Vector3 relativePos = player.position - transform.position;
+
+        transform.rotation = Quaternion.LookRotation(relativePos, new Vector3(0, 1, 0));
 
         if(!alreadyAttacked)
         {
@@ -110,7 +111,7 @@ public class EnemyAI : MonoBehaviour
     public void TakeDamage(float damage)
     {
         health -= damage;
-        Debug.Log("Damage Taken: " + health);
+        damageSound.Play();
         if (health <= 0) Destroy(gameObject);
     }
 }

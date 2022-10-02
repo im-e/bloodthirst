@@ -9,7 +9,6 @@ public class PlayerController : MonoBehaviour
     private KeyCode sprintKey = KeyCode.LeftShift;
     private KeyCode crouchKey = KeyCode.LeftControl;
     private KeyCode injectionKey = KeyCode.E;
-    private KeyCode meleeKey = KeyCode.Q;
 
     public MovementState state;
     public enum MovementState
@@ -58,7 +57,6 @@ public class PlayerController : MonoBehaviour
 
     [Header("Stats")]
     public float health = 100f;
-    public float maxHealth = 200f;
     public float bloodPool = 100f;
     public float bloodInjector = 0f;
     public bool isRage;
@@ -68,9 +66,7 @@ public class PlayerController : MonoBehaviour
     //static values
     private static float maxVial = 100f;
     private static float maxPool = 100f;
-    private static float maxGunHealth = 100f;
-    private static float vialOnKill = 25f;
-    private static float startingHealth = 100f;
+    private static float maxHealth = 100f;
 
     //blood training values
     private static float drainTime = 0.1f;
@@ -135,7 +131,6 @@ public class PlayerController : MonoBehaviour
 
     private void StateHandler()
     {
-
         //crouched
         if(Input.GetKey(crouchKey) && grounded)
         {
@@ -191,7 +186,7 @@ public class PlayerController : MonoBehaviour
         }
 
         //inject blood
-        if (Input.GetKey(injectionKey) && bloodInjector >= 100f)
+        if (Input.GetKey(injectionKey) && bloodInjector >= maxVial)
         {
             InjectBlood();
         }
@@ -259,10 +254,9 @@ public class PlayerController : MonoBehaviour
     {
         bloodInjector = 0f; //empty injector
         bloodPool = maxPool; //fill pool
-        gun.gunHealth = 100f; //fill gun health
+        health = 100f; //fill gun health
         isRage = false; //disable rage
         rageReset = true; //toggle rage as reset    
-        if (health < startingHealth) health = startingHealth;
         audioSourceInject.Play(); //play injection sound
     }
     void DrainPool()
@@ -275,9 +269,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void fillVial()
+    public void fillVial(float amount)
     {
-        bloodInjector += vialOnKill;
+        bloodInjector += amount;
     }
 
     private bool OnSlope()
