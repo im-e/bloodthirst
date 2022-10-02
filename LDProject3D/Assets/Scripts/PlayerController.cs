@@ -65,9 +65,20 @@ public class PlayerController : MonoBehaviour
     public float bloodInjector = 0f;
     private static float maxInjector = 100f;
 
+    
+
+    [Header("Scoring")]
+    public int scoreKillCount;
+    public int scoreShotsFired;
+    public int scoreShotsHit;
+    public int scoreSpikeKills;
+    public float scoreTimeTaken;
+    public int scoreTimesInjected;
+
     public bool isRage;
     private bool rageReset;
     public bool playerDead;
+    public bool goalReached;
 
     //blood draining values
     private static float drainTime = 0.1f;
@@ -95,10 +106,12 @@ public class PlayerController : MonoBehaviour
     private float hozInput;
     private float vertInput;
 
-
+    public bool gameInProgress;
 
     private void Start()
     {
+        scoreTimeTaken = 0f;
+
         //rigidbody controller setup
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
@@ -109,6 +122,8 @@ public class PlayerController : MonoBehaviour
         //Start rage as already being reset
         rageReset = true;
 
+        goalReached = false;
+
         //get player height
         startYScale = transform.localScale.y;
         playerHeight = startYScale;
@@ -116,8 +131,10 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (!playerDead)
+        if (gameInProgress && !playerDead && !goalReached)
         {
+            scoreTimeTaken += Time.deltaTime;
+
             //blood pool control
             if (bloodPool <= 0) Rage();
             if (bloodPool <= -100) PlayerDies();
@@ -131,12 +148,11 @@ public class PlayerController : MonoBehaviour
             SpeedControl();
             Drag();
         }
-
     }
 
     private void FixedUpdate()
     {
-        if (!playerDead) MovePlayer();
+        if (gameInProgress && !playerDead && !goalReached) MovePlayer();
     }
 
     private void StateHandler()
@@ -256,6 +272,7 @@ public class PlayerController : MonoBehaviour
 
     void InjectBlood()
     {
+        scoreTimesInjected += 1;
         bloodInjector = 0f; //empty injector
         bloodPool = maxPool; //fill pool
         gunAmmo = maxAmmo; //fill gun health
@@ -326,4 +343,14 @@ public class PlayerController : MonoBehaviour
         else
             rb.drag = 0;
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log(other.name);
+        if(other.name == "EndGoal")
+        {
+            goalReached = true;
+        }
+    }
+
 }

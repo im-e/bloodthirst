@@ -7,39 +7,66 @@ public class GameController : MonoBehaviour
 {
     public HudControl hc;
     public PlayerController pc;
-    private bool startGame;
 
+    public AudioSource soundDive;
+   
+    public bool startGame;
+    public bool gameInProgress;
     private static float timeRestart = 3f;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        Time.timeScale = 0f;
+        startGame = false;
+        gameInProgress = false;
+        pc.gameInProgress = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (!startGame && Input.GetKeyDown(KeyCode.Space))
         {
-            startGame = true;
+            StartCoroutine(GameStart());
         }
 
-        if (startGame) GameStart();
+        if (gameInProgress && pc.goalReached) GameGoalReached();
+        else if (!gameInProgress && pc.goalReached)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                int totalLevels = SceneManager.sceneCount;  //get total levels
+                if (SceneManager.GetActiveScene().buildIndex + 1 > totalLevels) //if next scene doesnt exist
+                    SceneManager.LoadScene(0); //go to main menu
+                else //go to next level
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            }
+            if (Input.GetKeyDown(KeyCode.R)) //restart
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            }
+        }
 
         if (pc.playerDead) Invoke("GameRestart", timeRestart);
     }
 
-    void GameStart()
+    void GameGoalReached()
     {
-        hc.GameStart();
-        Time.timeScale = 1.0f;
+        hc.GoalReached();
+        gameInProgress = false;
+        pc.gameInProgress = false;
     }
 
-    void GameRestart()
+    IEnumerator GameStart()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        soundDive.Play();
+        yield return new WaitForSeconds(1);
+        hc.GameStart();
+        startGame = true;
+        gameInProgress = true;
+        pc.gameInProgress = true;
     }
+
 }
 

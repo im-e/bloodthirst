@@ -40,26 +40,28 @@ public class Gun : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (pc.isRage) damage = rageDamage; //set gun damage
-        else damage = normalDamage;
-
-        //rotate gun towards crosshair for the particle laser
-        //RotateGun();
-        //update gun health position
-        GunHealthPositon();
-
-        //add time since the last time you shot
-        lastShotTime += Time.deltaTime;
-        //if shoot has been pressed
-        if (Input.GetButtonDown("Fire1") && pc.gunAmmo > 0)
+        if(pc.gameInProgress && !pc.playerDead && !pc.goalReached)
         {
-            //if player hasnt shot before the cooldown
-            if (lastShotTime >= shootCooldown) Shoot();
+            if (pc.isRage) damage = rageDamage; //set gun damage
+            else damage = normalDamage;
+
+            //update gun health position
+            GunHealthPositon();
+
+            //add time since the last time you shot
+            lastShotTime += Time.deltaTime;
+            //if shoot has been pressed
+            if (Input.GetButtonDown("Fire1") && pc.gunAmmo > 0)
+            {
+                //if player hasnt shot before the cooldown
+                if (lastShotTime >= shootCooldown) Shoot();
+            }
+            else if (Input.GetButtonDown("Fire1") && pc.gunAmmo <= 0)
+            {
+                gunEmpty.Play();
+            }
         }
-        else if(Input.GetButtonDown("Fire1") && pc.gunAmmo <= 0)
-        {
-            gunEmpty.Play();
-        }
+
     }
     
     void Shoot()
@@ -67,7 +69,8 @@ public class Gun : MonoBehaviour
         //gun has been fired
         laser.Play();   //play laser particle effect
         gunShoot.Play(); //play sound effect
-        
+        pc.scoreShotsFired += 1;
+
         RaycastHit hit;
         if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, range, enemyLayer))
         {
@@ -78,8 +81,10 @@ public class Gun : MonoBehaviour
             {
                 if((AI.health - damage) <= 0f) //if damage would kill enemy
                 {
+                    pc.scoreKillCount += 1;
                     pc.FillInjector(vialFillAmount); //fill vial
                 }
+                pc.scoreShotsHit += 1;
                 AI.TakeDamage(damage); //deal damage
             }
              
@@ -90,16 +95,6 @@ public class Gun : MonoBehaviour
 
         //reset shot cooldown
         lastShotTime = 0f;
-    }
-
-    void RotateGun()
-    {
-        RaycastHit hit;
-        if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, range))
-        {
-            Vector3 direction = hit.point - laser.transform.position;
-            laser.transform.rotation = Quaternion.LookRotation(direction);
-        }
     }
 
     void GunHealthPositon()

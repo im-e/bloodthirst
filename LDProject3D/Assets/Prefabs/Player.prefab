@@ -133,6 +133,7 @@ MonoBehaviour:
   sensX: 400
   sensY: 400
   orientation: {fileID: 1162564577070769845}
+  pc: {fileID: 1162564577130648357}
 --- !u!1 &1162564576626697863
 GameObject:
   m_ObjectHideFlags: 0
@@ -371,8 +372,15 @@ MonoBehaviour:
   gunAmmo: 100
   bloodPool: 100
   bloodInjector: 0
+  scoreKillCount: 0
+  scoreShotsFired: 0
+  scoreShotsHit: 0
+  scoreSpikeKills: 0
+  scoreTimeTaken: 0
+  scoreTimesInjected: 0
   isRage: 0
   playerDead: 0
+  goalReached: 0
   audioSourceJump: {fileID: 1162564577130648355}
   audioSourceInject: {fileID: 1162564577130648354}
   audioSourceRage: {fileID: 1162564577130648352}
@@ -381,6 +389,7 @@ MonoBehaviour:
   audioSourcePoolTick: {fileID: 1162564577130648351}
   audioSourceInjectorReduced: {fileID: 2219582383831963900}
   audioSourceInjFilled: {fileID: 4483200633827508320}
+  gameInProgress: 0
 --- !u!82 &1162564577130648355
 AudioSource:
   m_ObjectHideFlags: 0

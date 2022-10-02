@@ -46,13 +46,16 @@ public class EnemyAI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(pc.gameInProgress && !pc.playerDead && !pc.goalReached)
+        {
+            playerInSightRange = Physics.CheckSphere(transform.position, sightRange, playerMask);
+            playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, playerMask);
 
-        playerInSightRange = Physics.CheckSphere(transform.position, sightRange, playerMask);
-        playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, playerMask);
+            if (!playerInSightRange && !playerInAttackRange) Patroling();
+            if (playerInSightRange && !playerInAttackRange) ChasePlayer();
+            if (playerInAttackRange && playerInSightRange) AttackPlayer();
+        }
 
-        if (!playerInSightRange && !playerInAttackRange) Patroling();
-        if (playerInSightRange && !playerInAttackRange) ChasePlayer();
-        if (playerInAttackRange && playerInSightRange) AttackPlayer();
     }
 
     private void Patroling()

@@ -34,16 +34,19 @@ public class Spike : MonoBehaviour
 
     void Update()
     {
-        if (pc.isRage) vialFillAmount = vialRageFillAmount;
-        else vialFillAmount = vialNormalFillAmount;
-
-        //add time since the last time you shot
-        lastStabTime += Time.deltaTime;
-        //if shoot has been pressed
-        if (Input.GetButtonDown("Fire2")) //q or left alt
+        if (pc.gameInProgress && !pc.playerDead && !pc.goalReached)
         {
-            //if player hasnt shot before the cooldown
-            if (lastStabTime >= stabCooldown) Stab();
+            if (pc.isRage) vialFillAmount = vialRageFillAmount;
+            else vialFillAmount = vialNormalFillAmount;
+
+            //add time since the last time you shot
+            lastStabTime += Time.deltaTime;
+            //if shoot has been pressed
+            if (Input.GetButtonDown("Fire2")) //q or left alt
+            {
+                //if player hasnt shot before the cooldown
+                if (lastStabTime >= stabCooldown) Stab();
+            }
         }
     }
 
@@ -56,14 +59,14 @@ public class Spike : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, range, enemyMask))
         {
-            Debug.Log(hit.transform.name);
 
             EnemyAI AI = hit.transform.GetComponent<EnemyAI>();
             if (AI != null) //check just incase
             {
-                Debug.Log(hit.transform.name);
                 if ((AI.health - damage) <= 0f) //if damage would kill enemy
                 {
+                    pc.scoreKillCount += 1;
+                    pc.scoreSpikeKills += 1;
                     pc.FillInjector(vialFillAmount); //fill vial
                 }
                 AI.TakeDamage(damage); //deal damage

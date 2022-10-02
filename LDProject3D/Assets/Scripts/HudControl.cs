@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using UnityEngine.SceneManagement;
 
 public class HudControl : MonoBehaviour
 {
@@ -12,6 +13,18 @@ public class HudControl : MonoBehaviour
     public GameObject uiGame;
     public GameObject uiDeath;
     public GameObject uiStart;
+    public GameObject uiGoal;
+
+    [Header("StartUI Text")]
+    public TMP_Text textDepth;
+
+    [Header("GoalUI Text")]
+    public TMP_Text textTime;
+    public TMP_Text textKills;
+    public TMP_Text textKillTotal;
+    public TMP_Text textShotsHit;
+    public TMP_Text textShotsFired;
+    public TMP_Text textSpikeKills;
 
     [Header("Injector")]
     public Image injection;
@@ -36,6 +49,8 @@ public class HudControl : MonoBehaviour
 
     public TMP_Text poolText;
 
+    int startEnemyCount;
+
     static private float injThreshold0 = 0f;
     static private float injThreshold1 = 14.2f;
     static private float injThreshold2 = 28.5f;
@@ -47,7 +62,10 @@ public class HudControl : MonoBehaviour
 
     private void Start()
     {
+        startEnemyCount = GameObject.Find("Enemies").transform.childCount;
         pc = player.GetComponent<PlayerController>();
+        textDepth.text = SceneManager.GetActiveScene().buildIndex.ToString();
+        
     }
 
     // Update is called once per frame
@@ -61,8 +79,30 @@ public class HudControl : MonoBehaviour
         if (pc.playerDead) GameEnd();
     }
 
+    public void GoalReached()
+    {
+        textTime.text = pc.scoreTimeTaken.ToString();
+        textKills.text = pc.scoreKillCount.ToString();
+        string minutes = ((int)pc.scoreTimeTaken / 60).ToString("00");   //get the minutes value by manipulating the rawTime while formatting it in the right way
+        string seconds = (pc.scoreTimeTaken % 60).ToString("00");        //get the Seconds value by manipulating the rawTime while formatting it in the right way
+        string miliseconds = ((int)(pc.scoreTimeTaken * 100f) % 100).ToString("00"); //get the miliseconds value by manipulating the rawTime while formatting it in the right way
+
+        textTime.text = minutes + ":" + seconds + ":" + miliseconds; //make/update the timer with our formatted variables
+
+        textKillTotal.text = startEnemyCount.ToString();
+        textShotsHit.text = pc.scoreShotsHit.ToString();
+        textShotsFired.text = pc.scoreShotsFired.ToString();
+        textSpikeKills.text = pc.scoreSpikeKills.ToString();
+
+        uiDeath.SetActive(false);
+        uiStart.SetActive(false);
+        uiGame.SetActive(false);
+        uiGoal.SetActive(true);
+    }
+
     public void GameStart()
     {
+        uiGoal.SetActive(false);
         uiDeath.SetActive(false);
         uiStart.SetActive(false);
         uiGame.SetActive(true);
@@ -70,6 +110,7 @@ public class HudControl : MonoBehaviour
 
     void GameEnd()
     {
+        uiGoal.SetActive(false);
         uiStart.SetActive(false);
         uiGame.SetActive(false);
         uiDeath.SetActive(true);
