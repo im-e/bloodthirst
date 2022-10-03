@@ -73573,20 +73573,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4868539693814352474, guid: dd00252d5f55610479b5508f5f7b5291, type: 3}
-      propertyPath: player
-      value: 
-      objectReference: {fileID: 1853053080}
-    - target: {fileID: 4868539693814352474, guid: dd00252d5f55610479b5508f5f7b5291, type: 3}
       propertyPath: playerObject
       value: 
       objectReference: {fileID: 1853053080}
     - target: {fileID: 4868539693814352477, guid: dd00252d5f55610479b5508f5f7b5291, type: 3}
       propertyPath: m_Name
       value: HUDCanvas
-      objectReference: {fileID: 0}
-    - target: {fileID: 4868539694603526551, guid: dd00252d5f55610479b5508f5f7b5291, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dd00252d5f55610479b5508f5f7b5291, type: 3}
