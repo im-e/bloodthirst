@@ -29,6 +29,7 @@ public class GameController : MonoBehaviour
         if (!startGame && Input.GetKeyDown(KeyCode.Space))
         {
             StartCoroutine(GameStart());
+            startGame = true;
         }
 
         if (gameInProgress && pc.goalReached) GameGoalReached();
@@ -68,7 +69,6 @@ public class GameController : MonoBehaviour
         soundDive.Play();
         yield return new WaitForSeconds(1);
         hc.GameStart();
-        startGame = true;
         gameInProgress = true;
         pc.gameInProgress = true;
     }

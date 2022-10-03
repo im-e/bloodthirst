@@ -73584,6 +73584,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: HUDCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 4868539694603526551, guid: dd00252d5f55610479b5508f5f7b5291, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dd00252d5f55610479b5508f5f7b5291, type: 3}
 --- !u!1001 &8343966178446220466
