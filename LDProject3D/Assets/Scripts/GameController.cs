@@ -48,7 +48,12 @@ public class GameController : MonoBehaviour
             }
         }
 
-        if (pc.playerDead) Invoke("GameRestart", timeRestart);
+        if (gameInProgress && pc.playerDead)
+        {
+            gameInProgress = false;
+            StartCoroutine(GameRestart());
+        }
+            
     }
 
     void GameGoalReached()
@@ -68,5 +73,10 @@ public class GameController : MonoBehaviour
         pc.gameInProgress = true;
     }
 
+    IEnumerator GameRestart()
+    {
+        yield return new WaitForSeconds(timeRestart);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
 }
 

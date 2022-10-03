@@ -267,7 +267,6 @@ public class PlayerController : MonoBehaviour
     void PlayerDies()
     {
         playerDead = true;
-        Time.timeScale = 0f;
     }
 
     void InjectBlood()

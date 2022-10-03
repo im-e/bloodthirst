@@ -1166,7 +1166,6 @@ RectTransform:
   - {fileID: 4868539695565586160}
   - {fileID: 4868539694654151837}
   - {fileID: 4868539694540710289}
-  - {fileID: 4868539695051568363}
   m_Father: {fileID: 4868539693814352473}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2075,12 +2074,12 @@ GameObject:
   - component: {fileID: 4868539695051568373}
   - component: {fileID: 4868539695051568372}
   m_Layer: 5
-  m_Name: RageOverlay
+  m_Name: DeathOverlay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &4868539695051568363
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2093,13 +2092,13 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4868539694603526544}
-  m_RootOrder: 4
+  m_Father: {fileID: 4868539695085196738}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 848, y: 433}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4868539695051568373
 CanvasRenderer:
@@ -2168,6 +2167,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4868539695047502323}
+  - {fileID: 4868539695051568363}
   m_Father: {fileID: 4868539693814352473}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

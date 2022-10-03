@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.09751369, g: 0.03759811, b: 0.008099406, a: 1}
+  m_IndirectSpecularColor: {r: 0.34497213, g: 0.21388811, b: 0.08683211, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -64493,7 +64493,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-177360
+  m_Name: pb_Mesh-22120
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -73473,7 +73473,7 @@ PrefabInstance:
       objectReference: {fileID: 1803533670}
     - target: {fileID: 1162564577744418125, guid: 60e79ac2d1269e940b4780900a30d678, type: 3}
       propertyPath: m_VersionIndex
-      value: 2045
+      value: 2051
       objectReference: {fileID: 0}
     - target: {fileID: 1162564577744418127, guid: 60e79ac2d1269e940b4780900a30d678, type: 3}
       propertyPath: m_Mesh
@@ -73574,6 +73574,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4868539693814352474, guid: dd00252d5f55610479b5508f5f7b5291, type: 3}
       propertyPath: player
+      value: 
+      objectReference: {fileID: 1853053080}
+    - target: {fileID: 4868539693814352474, guid: dd00252d5f55610479b5508f5f7b5291, type: 3}
+      propertyPath: playerObject
       value: 
       objectReference: {fileID: 1853053080}
     - target: {fileID: 4868539693814352477, guid: dd00252d5f55610479b5508f5f7b5291, type: 3}

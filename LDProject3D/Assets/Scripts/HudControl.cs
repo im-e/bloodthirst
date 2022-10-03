@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class HudControl : MonoBehaviour
 {
-    public GameObject player;
+    public GameObject playerObject;
     private PlayerController pc;
 
     [Header("UI Groups")]
@@ -63,7 +63,7 @@ public class HudControl : MonoBehaviour
     private void Start()
     {
         startEnemyCount = GameObject.Find("Enemies").transform.childCount;
-        pc = player.GetComponent<PlayerController>();
+        pc = playerObject.GetComponent<PlayerController>();
         textDepth.text = SceneManager.GetActiveScene().buildIndex.ToString();
         
     }
